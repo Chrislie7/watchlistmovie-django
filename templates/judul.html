@@ -1,0 +1,59 @@
+{% load static %}
+
+<center>
+    <h1></h1>
+    {% if user.is_authenticated %}
+
+    <style>
+      
+        .Iam {
+            font: normal 40px/50px Montserrat, sans-serif;
+            color: #999;
+        }
+
+        .Iam p {
+            height: 50px;
+            float: right;
+        }
+
+        .Iam b {
+            float: right;
+            overflow: hidden;
+            position: relative;
+        }
+      
+    </style>
+    </head>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <nav class="nav justify-content-right">
+                    <nav class="navbar navbar-inverse">
+                        <div class="container-fluid">
+                            <div class="navbar-header">
+                                
+                                <a class="navbar-brand" href="{% url 'homePage' %}">Watch Movie List Website</a>
+                                
+                            </div>
+                            <ul class="nav navbar-nav pull-right">
+                                <li><a href="{% url 'WatchListView' %}" class="nav-link text-white">My Watch List</a>
+                                </li>
+                                <li><a href="{% url 'keluar' %}" class="nav-link text-white">Keluar</a></li>
+                            </ul>
+                        </div>
+
+                    </nav>
+
+                    <div class="Iam">
+                        <p>Halo, <strong>{{user}}!</strong>
+                    </div>
+
+                </nav>
+            </div>
+        </div>
+    </div>
+
+
+    {% endif %}
+</center>

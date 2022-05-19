@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Watch List Movie</title>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"
+    integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <style>
+    .column_wrapper {
+      display: flex;
+    }
+
+    .column_wrapper>div {
+      width: 50%;
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+
+    .column_wrapper div.response {
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid #ccc;
+      min-height: 50px;
+      word-wrap: break-word;
+      padding: 10px;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    p {
+      word-break: break-word;
+    }
+
+    label {
+      display: block;
+    }
+
+    div.pad,
+    input+label,
+    textarea+label {
+      margin-top: 20px;
+    }
+
+    textarea:disabled,
+    input[type="text"]:disabled,
+    input[type="password"]:disabled {
+      opacity: 0.5;
+    }
+
+    textarea,
+    input[type="text"],
+    input[type="password"] {
+      box-sizing: border-box;
+      outline: none;
+      width: 100%;
+      font-size: 1.2em;
+      line-height: 1.2em;
+      height: 2.4em;
+      padding: 10px;
+      border: 1px solid grey;
+    }
+
+    .center {
+      margin: auto;
+      width: 60%;
+      border: 5px solid #FFFF00;
+      padding: 10px;
+    }
+
+    textarea {}
+
+    input[type="text"],
+    input[type="password"] {}
+  </style>
+
+  <div class="container ">
+    <div class="row">
+      <div class="col-md-4"></div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <b>
+              <center style="font-size: 300%;">3rd Party Authentication Request</center>
+            </b> <br><br>
+          </div>
+
+
+          <div>
+            <label>Anda Diarahkan kesini karena website ini membutuhkan persetujuan anda agar website ini diberikan
+              akses ke TMDB </label>
+            <textarea id="api_key" name="api_key" placeholder="Paste your v3 API key here"></textarea>
+          </div>
+          <div class="column_wrapper">
+
+            <div>
+              <button id="getRequestToken" class="btn btn-primary">1: Get Request Token</button>
+              <button id="getAccessToken" class="hide btn btn-primary">2: Get Session ID</button>
+              <button id="finish" class="hide btn btn-primary">4: Finish</button>
+
+              <p id="session_id"></p>
+            </div>
+            <h2 hidden>Error</h2>
+            <div id="error" hidden class="response"></div>
+
+            <h2 id="response_title" hidden>Response <span></span></h2>
+            <div id="response" hidden class="response"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4"></div>
+  </div>
+  </div>
+
+  <script type="text/javascript" charset="utf-8">
+    // var api_host = 'http://api.dev';
+    // var web_host = 'http://web.dev';
+    var mySite = 'http://127.0.0.1:8000';
+    var api_host = 'https://api.themoviedb.org';
+    var web_host = 'https://www.themoviedb.org';
+    var requestToken = '';
+    var requestTokenID = '';
+    function getApiKey() {
+      return $('#api_key').val();
+    }
+
+    function showError(response) {
+    }
+
+    function showResponse(response, time) {
+    }
+
+
+    function getRequestToken() {
+      $.ajax({
+        url: api_host + '/3/authentication/token/new?api_key=' + getApiKey(),
+        method: 'GET',
+        dataType: 'json',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        start_time: new Date().getTime()
+      }).error(function (response) {
+        showError(response);
+      }).fail(function (response) {
+        showError(response);
+      }).done(function (response) {
+        showResponse(response, (new Date().getTime() - this.start_time));
+
+        if (response.success) {
+          requestToken = response.request_token
+          $('#getAccessToken').removeClass('hide');
+          window.open(web_host + '/authenticate/' + requestToken);
+        }
+      });
+    }
+
+    function getAccessToken() {
+      $.ajax({
+        url: api_host + '/3/authentication/session/new?api_key=' + getApiKey() + '&request_token=' + requestToken,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        dataType: 'json',
+        start_time: new Date().getTime()
+      }).error(function (response) {
+        showError(response);
+      }).fail(function (response) {
+        showError(response);
+      }).done(function (response) {
+        showResponse(response, (new Date().getTime() - this.start_time));
+        sessionID = response.session_id
+        // $('#session_id').html(response.session_id);
+        $.ajax({
+          url: mySite + '/account/saveAccount/' + getApiKey() + '/' + response.session_id,
+          method: 'get',
+          headers: {
+            'Content-Type': 'application/json',
+
+          },
+          dataType: 'json',
+          start_time: new Date().getTime()
+        }).error(function (response) {
+          showError(response);
+        }).fail(function (response) {
+          showError(response);
+        }).done(function (response) {
+          window.location.reload();
+          $('#session_id').html("Berhasil, silakan refresh halaman ini..")
+        });
+
+      });
+    }
+    // function getAccessToken() {
+    // $.ajax({
+    //     url: mySite+'/account/saveAccount/' + getApiKey() + '/' + response.session_id,
+    //     method: 'get',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+
+    //     },
+    //     dataType: 'json',
+    //     start_time: new Date().getTime()
+    //   }).error(function(response) {
+    //     showError(response);
+    //   }).fail(function(response) {
+    //     showError(response);
+    //   }).done(function(response) {
+    //     showResponse(response, (new Date().getTime() - this.start_time));
+
+    //     $('#session_id').html(response.session_id);
+
+    //   });
+    // }
+    $(document).ready(function () {
+      $('#getRequestToken').on('click', function () {
+        getRequestToken();
+      });
+
+      $('#approveRequestToken').on('click', function () {
+        window.open(web_host + '/authenticate/' + requestToken);
+      });
+
+      $('#getAccessToken').on('click', function () {
+        getAccessToken();
+      });
+
+    });
+  </script>
+</body>
+
+</html>
